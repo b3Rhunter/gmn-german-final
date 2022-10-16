@@ -1,4 +1,4 @@
-import { Button, Col, Menu, Row, notification } from "antd";
+import { Button, Col, Menu, Row, notification, Modal } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -52,7 +52,7 @@ const { ethers } = require("ethers");
 const initialNetwork = NETWORKS.polygon; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true;
+const DEBUG = false;
 const NETWORKCHECK = true;
 const USE_BURNER_WALLET = false; // toggle burner wallet feature
 const USE_NETWORK_SELECTOR = false;
@@ -243,6 +243,7 @@ function App(props) {
   const [isAuth, setIsAuth] = useState(false);
   const [single, setSingle] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
+  const [open, setOpen] = useState();
 
   function changeContent() {
     setSingle(!single);
@@ -379,6 +380,24 @@ function App(props) {
         </div>
       </Header>
 
+      <Modal  
+        visible={open}
+        onOk={() => {
+          setOpen(!open);
+         }}
+        onCancel={() => {
+        setOpen(!open);
+        }}
+        width={"100%"}
+        >
+          <Row>
+            <Col>
+            <Route  component={OnePost} path="/:slug" />
+            </Col>
+          </Row>
+         
+        </Modal>
+
       <button   className="mint"
                 onClick={async () => {
                   /* look how you call setPurpose on your contract: */
@@ -451,7 +470,7 @@ function App(props) {
         </div>
       </div>
 
-      {single ? (
+
         <div className="min-h-screen p-12">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -481,7 +500,9 @@ function App(props) {
                         {isAuth && (
                           <Link to={"/" + post.slug.current} key={post.slug.current}>
                             <Button
-                              onClick={changeContent}
+                              onClick={() => {
+                                setOpen(!open);
+                              }}
                               className="view-btn"
                               type="primary"
                               danger
@@ -498,9 +519,6 @@ function App(props) {
             </div>
           </div>
         </div>
-      ) : (
-        <Route component={OnePost} path="/:slug" />
-      )}
 
       <NetworkDisplay
         NETWORKCHECK={NETWORKCHECK}
